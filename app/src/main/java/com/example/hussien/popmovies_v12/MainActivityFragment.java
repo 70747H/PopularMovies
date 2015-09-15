@@ -15,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.example.hussien.popmovies_v12.adapters.MovieGridAdapter;
+import com.example.hussien.popmovies_v12.data.MovieContract;
 import com.example.hussien.popmovies_v12.model.Movie;
 
 import org.json.JSONArray;
@@ -47,6 +48,26 @@ public class MainActivityFragment extends Fragment {
     private String mSortBy = POPULARITY_DESC;
 
     private ArrayList<Movie> mMovies = null;
+
+    private static final String[] MOVIE_COLUMNS = {
+        MovieContract.MovieEntry._ID,
+        MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+        MovieContract.MovieEntry.COLUMN_TITLE,
+        MovieContract.MovieEntry.COLUMN_IMAGE,
+        MovieContract.MovieEntry.COLUMN_IMAGE2,
+        MovieContract.MovieEntry.COLUMN_OVERVIEW,
+        MovieContract.MovieEntry.COLUMN_RATING,
+        MovieContract.MovieEntry.COLUMN_DATE
+    };
+
+    public static final int COL_ID = 0;
+    public static final int COL_MOVIE_ID = 1;
+    public static final int COL_TITLE = 2;
+    public static final int COL_IMAGE = 3;
+    public static final int COL_IMAGE2 = 4;
+    public static final int COL_OVERVIEW = 5;
+    public static final int COL_RATING = 6;
+    public static final int COL_DATE = 7;
 
     public MainActivityFragment() {
     }
