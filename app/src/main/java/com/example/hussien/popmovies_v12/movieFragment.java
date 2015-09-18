@@ -1,9 +1,14 @@
 package com.example.hussien.popmovies_v12;
 
+import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -34,11 +39,13 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class movieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private GridView mGridView;
 
     private MovieGridAdapter mMovieGridAdapter;
+
+    private static final int MOVIE_LOADER = 0;
 
     private static final String SORT_SETTING_KEY = "sort_setting";
     private static final String POPULARITY_DESC = "popularity.desc";
@@ -69,7 +76,27 @@ public class MainActivityFragment extends Fragment {
     public static final int COL_RATING = 6;
     public static final int COL_DATE = 7;
 
-    public MainActivityFragment() {
+    public movieFragment() {
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(getActivity(),
+        MovieContract.MovieEntry.CONTENT_URI,
+                                null,
+                                null,
+                                null,
+                                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mMovieGridAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mMovieGridAdapter.swapCursor(null);
     }
 
     /**
@@ -141,19 +168,25 @@ public class MainActivityFragment extends Fragment {
 
         mGridView = (GridView) view.findViewById(R.id.gridview_movies);
 
-        mMovieGridAdapter = new MovieGridAdapter(getActivity(), new ArrayList<Movie>());
+//        mMovieGridAdapter = new MovieGridAdapter(getActivity(), new ArrayList<Movie>());
+        mMovieGridAdapter = new MovieGridAdapter(getActivity(),null,0);
 
         mGridView.setAdapter(mMovieGridAdapter);
 
         mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Movie movie = mMovieGridAdapter.getItem(position);
-                ((Callback) getActivity()).onItemSelected(movie);
-            }
-        });
+//                Movie movie = mMovieGridAdapter.getItem(position);
+//                ((Callback) getActivity()).onItemSelected(movie);
+                Cursor currentData = (Cursor) parent.getItemAtPosition(position);
+                if (currentData != null) {
+                    Intent detailsIntent = new Intent(getActivity(), DetailActivity.class);
+                    final int MOVIE_ID_COL = currentData.getColumnIndex(MovieContract.MovieEntry._ID);
+                    Uri movieUri = MovieContract.MovieEntry.buildMovieUri(currentData.getInt(MOVIE_ID_COL));
 
-        if (savedInstanceState != null) {
+                    detailsIntent.setData(movieUri);
+                    startActivity(detailsIntent);
+/*        if (savedInstanceState != null) {
             if (savedInstanceState.containsKey(SORT_SETTING_KEY)) {
                 mSortBy = savedInstanceState.getString(SORT_SETTING_KEY);
             }
@@ -166,10 +199,17 @@ public class MainActivityFragment extends Fragment {
             }
         } else {
             updateMovies(mSortBy);
-        }
-
+        }*/
+                }
+            }
+        });
         return view;
     }
+    @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+                getLoaderManager().initLoader(MOVIE_LOADER, null, this);
+                super.onActivityCreated(savedInstanceState);
+          }
 
     private void updateMovies(String sort_by) {
 

@@ -1,15 +1,18 @@
 package com.example.hussien.popmovies_v12.adapters;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.hussien.popmovies_v12.R;
+import com.example.hussien.popmovies_v12.data.MovieContract;
 import com.example.hussien.popmovies_v12.model.Movie;
 
 import java.util.List;
@@ -17,19 +20,20 @@ import java.util.List;
 /**
  * Created by Hussien on 02-Sep-15.
  */
-public class MovieGridAdapter extends BaseAdapter {
+public class MovieGridAdapter extends  CursorAdapter {
 
     private final Context mContext;
     private final LayoutInflater mInflater;
 
     private final Movie mLock = new Movie();
 
-    private List<Movie> mObjects;
+    private List<Movie> mObjects=null;
 
-    public MovieGridAdapter(Context context, List<Movie> objects) {
+    public MovieGridAdapter(Context context,Cursor c,int flags) {
+        super(context,c,flags);
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        mObjects = objects;
+//        mObjects = objects;
     }
 
     public Context getContext() {
@@ -93,6 +97,29 @@ public class MovieGridAdapter extends BaseAdapter {
         viewHolder.titleView.setText(movie.getTitle());
 
         return view;
+    }
+
+    @Override
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
+        View view = LayoutInflater.from(context).inflate(R.layout.grid_item_movie, parent, false);
+        return view;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+        ViewHolder holder = new ViewHolder(view);
+        ImageView imageView = holder.imageView;
+        TextView titleView = holder.titleView;
+        int movieImageColumn = cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_IMAGE);
+        String moviePoster = cursor.getString(movieImageColumn);
+        Uri imageUri = Uri.parse("http://image.tmdb.org/t/p/").buildUpon()
+                .appendPath(context.getString(R.string.api_image_size_medium))
+                .appendPath(moviePoster.substring(1))
+                .build();
+
+        Glide.with(context).load(imageUri)
+                .placeholder(R.drawable.loading)
+                .into(imageView);
     }
 
     public static class ViewHolder {

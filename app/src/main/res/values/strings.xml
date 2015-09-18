@@ -16,4 +16,5 @@
     <string name="action_sort_by_favorite">Favorites</string>
     <string name="action_share">Share</string>
     <string name="tmdb_api_key">f40c1f74096f20cb312b611b4d8fa7c7</string>
+    <string name="api.image.size.medium" translatable="false">w342</string>
 </resources>
