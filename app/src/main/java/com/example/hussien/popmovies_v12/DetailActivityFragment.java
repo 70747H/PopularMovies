@@ -19,6 +19,7 @@ import com.example.hussien.popmovies_v12.model.Movie;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -50,15 +51,13 @@ public class DetailActivityFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if (mMovie != null) {
-            inflater.inflate(R.menu.menu_detail, menu);
+            inflater.inflate(R.menu.menu_fragment_detail, menu);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
-        int id = item.getItemId();
-
-        return false;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -86,7 +85,6 @@ public class DetailActivityFragment extends Fragment {
         mOverviewView = (TextView) rootView.findViewById(R.id.detail_overview);
         mDateView = (TextView) rootView.findViewById(R.id.detail_date);
         mVoteAverageView = (TextView) rootView.findViewById(R.id.detail_vote_average);
-
 
         if (mMovie != null) {
 

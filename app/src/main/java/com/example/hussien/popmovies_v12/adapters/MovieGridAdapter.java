@@ -1,18 +1,15 @@
 package com.example.hussien.popmovies_v12.adapters;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.hussien.popmovies_v12.R;
-import com.example.hussien.popmovies_v12.data.MovieContract;
 import com.example.hussien.popmovies_v12.model.Movie;
 
 import java.util.List;
@@ -20,35 +17,82 @@ import java.util.List;
 /**
  * Created by Hussien on 02-Sep-15.
  */
-public class MovieGridAdapter extends  CursorAdapter {
+public class MovieGridAdapter extends BaseAdapter {
 
     private final Context mContext;
     private final LayoutInflater mInflater;
 
     private final Movie mLock = new Movie();
 
-    private List<Movie> mObjects=null;
+    private List<Movie> mObjects;
 
-    public MovieGridAdapter(Context context,Cursor c,int flags) {
-        super(context,c,flags);
+    public MovieGridAdapter(Context context, List<Movie> objects) {
         mContext = context;
         mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mObjects = objects;
+    }
+
+    public Context getContext() {
+        return mContext;
+    }
+
+    public void add(Movie object) {
+        synchronized (mLock) {
+            mObjects.add(object);
+        }
+        notifyDataSetChanged();
+    }
+
+    public void clear() {
+        synchronized (mLock) {
+            mObjects.clear();
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setData(List<Movie> data) {
+        clear();
+        for (Movie movie : data) {
+            add(movie);
+        }
     }
 
     @Override
-    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.grid_item_movie, parent, false);
-        return view;
+    public int getCount() {
+        return mObjects.size();
     }
 
     @Override
-    public void bindView(View view, Context context, Cursor cursor) {
-String image_url = "http://image.tmdb.org/t/p/w185" + movie.getImage();
+    public Movie getItem(int position) {
+        return mObjects.get(position);
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view = convertView;
+        ViewHolder viewHolder;
+
+        if (view == null) {
+            view = mInflater.inflate(R.layout.grid_item_movie, parent, false);
+            viewHolder = new ViewHolder(view);
+            view.setTag(viewHolder);
+        }
+
+        final Movie movie = getItem(position);
+
+        String image_url = "http://image.tmdb.org/t/p/w185" + movie.getImage();
 
         viewHolder = (ViewHolder) view.getTag();
 
         Glide.with(getContext()).load(image_url).into(viewHolder.imageView);
         viewHolder.titleView.setText(movie.getTitle());
+
+        return view;
     }
 
     public static class ViewHolder {
